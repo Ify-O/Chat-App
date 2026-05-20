@@ -13,6 +13,7 @@ function addMessage(message, type = "incoming") {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
+
 sendBtn.addEventListener("click", () => {
   const text = input.value.trim();
   if (text === "") return;
@@ -25,6 +26,7 @@ sendBtn.addEventListener("click", () => {
   input.value = "";
 });
 
+
 input.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     sendBtn.click();
@@ -34,4 +36,8 @@ input.addEventListener("keypress", (e) => {
 socket.on("chat-history", (messages) => {
   messagesContainer.innerHTML = "";
   messages.forEach((msg) => addMessage(msg, "incoming"));
+});
+
+socket.on("receive-message", (message) => {
+  addMessage(message, message.senderId === socket.id ? "outgoing" : "incoming");
 });
