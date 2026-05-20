@@ -40,18 +40,21 @@ body {
   border-radius: 10px;
   max-width: 70%;
   word-wrap: break-word;
+  margin: 5px 0;
 }
 
 .message.outgoing {
   background: #440c4e;
   color: #fbf8f8;
   align-self: flex-end;
+  text-align: right;
 }
 
 .message.incoming {
   background: #d5bae1;
   color: #333;
   align-self: flex-start;
+  text-align: left;
 }
 
 .chat-input {
