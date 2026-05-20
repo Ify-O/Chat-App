@@ -7,6 +7,7 @@ const app = express();
 app.use(cors());
 
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -16,7 +17,8 @@ const io = new Server(server, {
 let messages = [];
 
 io.on("connection", (socket) => {
-  // send old messages
+  console.log("User connected:", socket.id);
+
   socket.emit("chat-history", messages);
 
   socket.on("send-message", (data) => {
@@ -26,14 +28,13 @@ io.on("connection", (socket) => {
       senderId: data.senderId,
     };
 
-    messages.push(message); // store in backend
-
-    io.emit("receive-message", message); // broadcast
+    messages.push(message);
+    io.emit("receive-message", message);
   });
-});
 
-socket.on("disconnect", () => {
-  console.log("User disconnected:", socket.id);
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
 });
 
 server.listen(3000, () => {
