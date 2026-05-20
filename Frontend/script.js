@@ -24,3 +24,9 @@ sendBtn.addEventListener("click", () => {
 
   input.value = "";
 });
+
+input.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    sendBtn.click();
+  }
+});
