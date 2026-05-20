@@ -16,7 +16,7 @@ body {
   flex-direction: column;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
 .chat-header {
@@ -35,3 +35,14 @@ body {
   gap: 10px;
 }
 
+.message {
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.message.incoming {
+  background: #e5e7eb;
+  align-self: flex-start;
+}
