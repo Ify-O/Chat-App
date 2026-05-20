@@ -12,3 +12,15 @@ function addMessage(message, type = "incoming") {
 
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
+sendBtn.addEventListener("click", () => {
+  const text = input.value.trim();
+  if (text === "") return;
+
+  socket.emit("send-message", {
+    text,
+    senderId: socket.id,
+  });
+
+  input.value = "";
+});
