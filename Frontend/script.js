@@ -30,3 +30,8 @@ input.addEventListener("keypress", (e) => {
     sendBtn.click();
   }
 });
+
+socket.on("chat-history", (messages) => {
+  messagesContainer.innerHTML = "";
+  messages.forEach((msg) => addMessage(msg, "incoming"));
+});
