@@ -36,42 +36,51 @@ body {
 }
 
 .message {
-  padding: 10px;
-  border-radius: 10px;
   max-width: 70%;
-  word-wrap: break-word;
+  padding: 8px 10px;
+  border-radius: 10px;
   margin: 5px 0;
+  display: flex;
+  flex-direction: column;
+  word-wrap: break-word;
 }
 
 .message.outgoing {
-  background: #440c4e;
-  color: #fbf8f8;
   align-self: flex-end;
-  text-align: right;
+  background: #440c4e;
+  color: white;
+  border-bottom-right-radius: 2px;
 }
 
 .message.incoming {
-  background: #d5bae1;
-  color: #333;
   align-self: flex-start;
-  text-align: left;
+  background: #ffffff;
+  color: #333;
+  border-bottom-left-radius: 2px;
 }
 
-.message-user {
-  font-size: 12px;
+.msg-user {
+  font-size: 11px;
   font-weight: bold;
-  margin-bottom: 4px;
-  opacity: 0.8;
+  margin-bottom: 3px;
+  opacity: 0.7;
 }
 
-.message-text {
+.msg-text {
   font-size: 14px;
+  line-height: 1.4;
 }
 
-.message-time {
+.msg-time {
   font-size: 10px;
   margin-top: 4px;
+  text-align: right;
   opacity: 0.6;
+}
+
+.chat-messages {
+  background: #e3cce3;
+  padding: 10px;
 }
 
 .chat-input {
