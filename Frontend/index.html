@@ -9,61 +9,34 @@
   </head>
 
   <body>
-
-    <!-- JOIN SCREEN -->
     <div id="joinScreen" class="join-screen">
-
       <div class="join-card">
         <h1>Welcome</h1>
 
         <p>Enter your name to join the chat</p>
 
-        <input
-          id="usernameInput"
-          type="text"
-          placeholder="Your name"
-        />
+        <input id="usernameInput" type="text" placeholder="Your name" />
 
-        <button id="joinBtn">
-          Join Chat
-        </button>
+        <button id="joinBtn">Join Chat</button>
       </div>
-
     </div>
 
-    <!-- CHAT SCREEN -->
     <div id="chatScreen" class="chat-container hidden">
-
-      <!-- HEADER -->
       <div class="chat-header">
         <h2>Live Chat</h2>
       </div>
 
-      <!-- MESSAGES -->
       <div id="messages" class="chat-messages"></div>
 
-      <!-- INPUT -->
       <div class="chat-input">
+        <input id="messageInput" type="text" placeholder="Type a message..." />
 
-        <input
-          id="messageInput"
-          type="text"
-          placeholder="Type a message..."
-        />
-
-        <button id="sendBtn">
-          Send
-        </button>
-
+        <button id="sendBtn">Send</button>
       </div>
-
     </div>
 
-    <!-- SOCKET.IO -->
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
-    <!-- SCRIPT -->
     <script src="script.js"></script>
-
   </body>
 </html>
