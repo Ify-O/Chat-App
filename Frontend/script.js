@@ -1,3 +1,5 @@
+const usernameInput = document.getElementById("usernameInput");
+
 const socket = io("http://localhost:3000");
 
 const messagesContainer = document.getElementById("messages");
