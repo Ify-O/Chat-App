@@ -25,9 +25,9 @@ io.on("connection", (socket) => {
     const message = {
       id: Date.now(),
 
-      username: data.username,
+      username: data.username || "Anonymous", // ✅ fallback safety
 
-      text: data.text,
+      text: data.text || "",
 
       senderId: data.senderId,
 
