@@ -24,11 +24,21 @@ io.on("connection", (socket) => {
   socket.on("send-message", (data) => {
     const message = {
       id: Date.now(),
+
+      username: data.username,
+
       text: data.text,
+
       senderId: data.senderId,
+
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
     messages.push(message);
+
     io.emit("receive-message", message);
   });
 
