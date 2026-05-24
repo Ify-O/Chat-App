@@ -37,5 +37,5 @@ socket.on("chat-history", (messages) => {
 });
 
 socket.on("receive-message", (message) => {
-  addMessage(message, message.senderId === socket.id ? "incoming" : "outgoing");
+  addMessage(message, message.senderId === socket.id ? "outgoing" : "incoming");
 });
