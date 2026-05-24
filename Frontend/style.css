@@ -57,6 +57,23 @@ body {
   text-align: left;
 }
 
+.message-user {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.message-text {
+  font-size: 14px;
+}
+
+.message-time {
+  font-size: 10px;
+  margin-top: 4px;
+  opacity: 0.6;
+}
+
 .chat-input {
   display: flex;
   padding: 10px;
@@ -79,4 +96,12 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.hidden {
+  display: none;
 }
