@@ -31,21 +31,14 @@ function addMessage(message, type = "incoming") {
   div.classList.add("message", type);
 
   div.innerHTML = `
-    <div class="message-user">
-      ${message.username}
-    </div>
+    <div class="msg-user">${message.username}</div>
 
-    <div class="message-text">
-      ${message.text}
-    </div>
+    <div class="msg-text">${message.text}</div>
 
-    <div class="message-time">
-      ${message.timestamp}
-    </div>
+    <div class="msg-time">${message.timestamp}</div>
   `;
 
   messagesContainer.appendChild(div);
-
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
@@ -73,10 +66,14 @@ socket.on("chat-history", (messages) => {
   messagesContainer.innerHTML = "";
 
   messages.forEach((msg) => {
-    addMessage(msg, msg.senderId === socket.id ? "outgoing" : "incoming");
+    addMessage(msg, msg.username === currentUser ? "outgoing" : "incoming");
   });
 });
 
 socket.on("receive-message", (message) => {
-  addMessage(message, message.senderId === socket.id ? "outgoing" : "incoming");
+  console.log("RECEIVED MESSAGE:", message);
+  addMessage(
+    message,
+    message.username === currentUser ? "outgoing" : "incoming",
+  );
 });
