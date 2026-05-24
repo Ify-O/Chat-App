@@ -17,10 +17,13 @@ function addMessage(message, type = "incoming") {
 
 sendBtn.addEventListener("click", () => {
   const text = input.value.trim();
-  if (text === "") return;
+  const username = usernameInput.value.trim();
+
+  if (text === "" || username === "") return;
 
   socket.emit("send-message", {
     text,
+    username,
     senderId: socket.id,
   });
 
