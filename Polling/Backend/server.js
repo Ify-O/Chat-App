@@ -31,4 +31,7 @@ app.post("/messages", (req, res) => {
   res.status(201).json(message);
 });
 
+const server = app.listen(3000, () => {
+  console.log("Polling server running on http://localhost:3000");
+});
 
