@@ -13,3 +13,18 @@ const wsServer = new WebSocketServer({
   httpServer: server,
 });
 
+let messages = [];
+
+function send(connection, data) {
+  connection.sendUTF(JSON.stringify(data));
+}
+
+wsServer.on("request", (request) => {
+  const connection = request.accept(null, request.origin);
+
+  console.log("User connected");
+
+  send(connection, {
+    command: "chat-history",
+    messages,
+  });
