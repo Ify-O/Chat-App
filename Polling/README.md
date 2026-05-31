@@ -43,3 +43,14 @@ Polling is simulated using:
 setInterval(() => {
   fetch("/messages")
 }, 1000);
+
+
+## Advantages
+- Simple to implement
+- Works with standard HTTP
+- Easy debugging
+
+## Disadvantages
+- Not truly real-time
+- Inefficient (constant requests)
+- Higher server load compared to WebSockets
