@@ -8,3 +8,4 @@ const messagesContainer = document.getElementById("messages");
 
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
+
