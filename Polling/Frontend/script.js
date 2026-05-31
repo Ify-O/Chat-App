@@ -11,7 +11,6 @@ const sendBtn = document.getElementById("sendBtn");
 
 let currentUser = "";
 
-
 const BASE_URL = "http://localhost:3000";
 
 joinBtn.addEventListener("click", () => {
@@ -23,7 +22,7 @@ joinBtn.addEventListener("click", () => {
   joinScreen.classList.add("hidden");
   chatScreen.classList.remove("hidden");
 
-  startPolling(); 
+  startPolling();
 });
 
 function addMessage(message, type = "incoming") {
@@ -41,7 +40,6 @@ function addMessage(message, type = "incoming") {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-
 async function fetchMessages() {
   try {
     const res = await fetch(`${BASE_URL}/messages`);
@@ -50,20 +48,20 @@ async function fetchMessages() {
     messagesContainer.innerHTML = "";
 
     messages.forEach((msg) => {
-      addMessage(msg, msgg.username === currentUser ? "outgoing" : "incoming");
+      addMessage(msg, msg.username === currentUser ? "outgoing" : "incoming");
     });
-  
+  } catch (err) {
+    console.error("Error fetching messages:", err);
+  }
 }
 
-
 function startPolling() {
-  fetchMessages(); // initial load
+  fetchMessages();
 
   setInterval(() => {
     fetchMessages();
-  }, 100);
+  }, 1000);
 }
-
 
 sendBtn.addEventListener("click", async () => {
   const text = input.value.trim();
@@ -81,11 +79,10 @@ sendBtn.addEventListener("click", async () => {
     }),
   });
 
-  input.valve = "";
+  input.value = "";
 });
 
-
-input.addEventListener("keyspress", (e) => {
+input.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     sendBtn.click();
   }
