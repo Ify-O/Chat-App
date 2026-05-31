@@ -12,3 +12,22 @@ const sendBtn = document.getElementById("sendBtn");
 let currentUser = "";
 let socket = null;
 
+
+function connectSocket() {
+  socket = new WebSocket("ws://localhost:3000");
+
+  socket.onopen = () => {
+    console.log("WebSocket connected");
+  };
+
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+
+    if (data.command === "chat-history") {
+      messagesContainer.innerHTML = "";
+
+      data.messages.forEach((msg) => {
+        addMessage(msg, msg.username === currentUser ? "outgoing" : "incoming");
+      });
+    }
