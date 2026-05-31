@@ -40,6 +40,8 @@ wsServer.on("request", (request) => {
         username: data.message.username || "Anonymous",
         text: data.message.text || "",
         senderId: data.message.senderId,
+        likes: 0,
+        dislikes: 0,
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -54,6 +56,37 @@ wsServer.on("request", (request) => {
           message,
         });
       });
+    }
+
+  
+    if (data.command === "like-message") {
+      const message = messages.find((msg) => msg.id === data.messageId);
+
+      if (message) {
+        message.likes++;
+
+        wsServer.connections.forEach((client) => {
+          send(client, {
+            command: "message-updated",
+            message,
+          });
+        });
+      }
+    }
+
+    if (data.command === "dislike-message") {
+      const message = messages.find((msg) => msg.id === data.messageId);
+
+      if (message) {
+        message.dislikes++;
+
+        wsServer.connections.forEach((client) => {
+          send(client, {
+            command: "message-updated",
+            message,
+          });
+        });
+      }
     }
   });
 
