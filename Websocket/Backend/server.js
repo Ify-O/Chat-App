@@ -58,9 +58,10 @@ wsServer.on("request", (request) => {
       });
     }
 
-  
     if (data.command === "like-message") {
-      const message = messages.find((msg) => msg.id === data.messageId);
+      const message = messages.find(
+        (msg) => String(msg.id) === String(data.messageId),
+      );
 
       if (message) {
         message.likes++;
@@ -75,7 +76,9 @@ wsServer.on("request", (request) => {
     }
 
     if (data.command === "dislike-message") {
-      const message = messages.find((msg) => msg.id === data.messageId);
+      const message = messages.find(
+        (msg) => String(msg.id) === String(data.messageId),
+      );
 
       if (message) {
         message.dislikes++;
