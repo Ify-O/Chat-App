@@ -56,10 +56,36 @@ function addMessage(message, type = "incoming") {
   div.classList.add("message", type);
 
   div.innerHTML = `
-    <div class="msg-user">${message.username}</div>
-    <div class="msg-text">${message.text}</div>
-    <div class="msg-time">${message.timestamp}</div>
-  `;
+  <div class="msg-user">${message.username}</div>
+  <div class="msg-text">${message.text}</div>
+  <div class="msg-time">${message.timestamp}</div>
+
+  <div class="reactions">
+    <button class="like-btn">👍 ${message.likes || 0}</button>
+    <button class="dislike-btn">👎 ${message.dislikes || 0}</button>
+  </div>
+`;
+
+  const likeBtn = div.querySelector(".like-btn");
+  const dislikeBtn = div.querySelector(".dislike-btn");
+
+  likeBtn.addEventListener("click", () => {
+    socket.send(
+      JSON.stringify({
+        command: "like-message",
+        messageId: message.id,
+      }),
+    );
+  });
+
+  dislikeBtn.addEventListener("click", () => {
+    socket.send(
+      JSON.stringify({
+        command: "dislike-message",
+        messageId: message.id,
+      }),
+    );
+  });
 
   messagesContainer.appendChild(div);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
