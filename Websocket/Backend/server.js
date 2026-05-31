@@ -57,4 +57,11 @@ wsServer.on("request", (request) => {
     }
   });
 
-  
+  connection.on("close", () => {
+    console.log("User disconnected");
+  });
+});
+
+server.listen(3000, () => {
+  console.log("WebSocket server running on http://localhost:3000");
+});
