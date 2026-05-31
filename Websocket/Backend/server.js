@@ -28,3 +28,33 @@ wsServer.on("request", (request) => {
     command: "chat-history",
     messages,
   });
+
+  connection.on("message", (msg) => {
+    if (msg.type !== "utf8") return;
+
+    const data = JSON.parse(msg.utf8Data);
+
+    if (data.command === "send-message") {
+      const message = {
+        id: Date.now(),
+        username: data.message.username || "Anonymous",
+        text: data.message.text || "",
+        senderId: data.message.senderId,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      messages.push(message);
+
+      wsServer.connections.forEach((client) => {
+        send(client, {
+          command: "new-message",
+          message,
+        });
+      });
+    }
+  });
+
+  
