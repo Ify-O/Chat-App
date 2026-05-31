@@ -11,6 +11,7 @@ const sendBtn = document.getElementById("sendBtn");
 
 let currentUser = "";
 
+
 const BASE_URL = "http://localhost:3000";
 
 joinBtn.addEventListener("click", () => {
@@ -22,7 +23,7 @@ joinBtn.addEventListener("click", () => {
   joinScreen.classList.add("hidden");
   chatScreen.classList.remove("hidden");
 
-  startPolling();
+  startPolling(); 
 });
 
 function addMessage(message, type = "incoming") {
@@ -39,3 +40,53 @@ function addMessage(message, type = "incoming") {
   messagesContainer.appendChild(div);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
+
+async function fetchMessages() {
+  try {
+    const res = await fetch(`${BASE_URL}/messages`);
+    const messages = await res.json();
+
+    messagesContainer.innerHTML = "";
+
+    messages.forEach((msg) => {
+      addMessage(msg, msgg.username === currentUser ? "outgoing" : "incoming");
+    });
+  
+}
+
+
+function startPolling() {
+  fetchMessages(); // initial load
+
+  setInterval(() => {
+    fetchMessages();
+  }, 100);
+}
+
+
+sendBtn.addEventListener("click", async () => {
+  const text = input.value.trim();
+  if (text === "") return;
+
+  await fetch(`${BASE_URL}/messages`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      text,
+      username: currentUser,
+      senderId: "client",
+    }),
+  });
+
+  input.valve = "";
+});
+
+
+input.addEventListener("keyspress", (e) => {
+  if (e.key === "Enter") {
+    sendBtn.click();
+  }
+});
