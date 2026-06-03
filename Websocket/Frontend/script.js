@@ -11,7 +11,8 @@ const sendBtn = document.getElementById("sendBtn");
 
 let currentUser = "";
 let socket = null;
-let messages = []; // ✅ IMPORTANT STATE
+
+let messages = [];
 
 function connectSocket() {
   socket = new WebSocket("ws://localhost:3000");
@@ -23,19 +24,17 @@ function connectSocket() {
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
-    // CHAT HISTORY
+    
     if (data.command === "chat-history") {
       messages = data.messages;
       renderMessages();
     }
 
-    // NEW MESSAGE
     if (data.command === "new-message") {
       messages.push(data.message);
       renderMessages();
     }
 
-    // UPDATED MESSAGE (likes/dislikes)
     if (data.command === "message-updated") {
       const index = messages.findIndex(
         (m) => String(m.id) === String(data.message.id),
@@ -43,7 +42,7 @@ function connectSocket() {
 
       if (index !== -1) {
         messages[index] = data.message;
-        renderMessages();
+        updateMessageUI(data.message);
       }
     }
   };
@@ -61,7 +60,6 @@ joinBtn.addEventListener("click", () => {
   connectSocket();
 });
 
-// SEND MESSAGE
 sendBtn.addEventListener("click", sendMessage);
 
 input.addEventListener("keypress", (e) => {
@@ -86,24 +84,39 @@ function sendMessage() {
   input.value = "";
 }
 
-// RENDER ALL MESSAGES
 function renderMessages() {
   messagesContainer.innerHTML = "";
-
-  messages.forEach((msg) => {
-    addMessage(msg, msg.username === currentUser ? "outgoing" : "incoming");
-  });
+  messages.forEach(renderSingleMessage);
 }
 
-// CREATE MESSAGE UI
-function addMessage(message, type = "incoming") {
+
+function renderSingleMessage(msg) {
   const div = document.createElement("div");
 
-  div.classList.add("message", type);
+  div.classList.add("message");
+  div.classList.add(msg.username === currentUser ? "outgoing" : "incoming");
 
-  div.dataset.id = message.id; // ✅ IMPORTANT FIX
+  div.dataset.id = msg.id;
 
-  div.innerHTML = `
+  div.innerHTML = getMessageHTML(msg);
+
+  attachEvents(div, msg);
+
+  messagesContainer.appendChild(div);
+}
+
+
+function updateMessageUI(msg) {
+  const el = document.querySelector(`[data-id="${msg.id}"]`);
+  if (el) {
+    el.innerHTML = getMessageHTML(msg);
+    attachEvents(el, msg);
+  }
+}
+
+
+function getMessageHTML(message) {
+  return `
     <div class="msg-user">${message.username}</div>
     <div class="msg-text">${message.text}</div>
     <div class="msg-time">${message.timestamp}</div>
@@ -113,27 +126,25 @@ function addMessage(message, type = "incoming") {
       <button class="dislike-btn">👎 ${message.dislikes || 0}</button>
     </div>
   `;
+}
 
-  // LIKE
-  div.querySelector(".like-btn").addEventListener("click", () => {
+
+function attachEvents(div, message) {
+  div.querySelector(".like-btn").onclick = () => {
     socket.send(
       JSON.stringify({
         command: "like-message",
         messageId: message.id,
       }),
     );
-  });
+  };
 
-  // DISLIKE
-  div.querySelector(".dislike-btn").addEventListener("click", () => {
+  div.querySelector(".dislike-btn").onclick = () => {
     socket.send(
       JSON.stringify({
         command: "dislike-message",
         messageId: message.id,
       }),
     );
-  });
-
-  messagesContainer.appendChild(div);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  };
 }
