@@ -1,13 +1,10 @@
-# WEBSOCKET README
-
-````md id="ws1"
 # WebSocket Chat Application
 
 ## Overview
 
-This version uses **native WebSockets (websocket npm package)** to implement real-time communication.
+This version of the chat application uses **native WebSockets (websocket npm package)** to enable real-time communication between clients and the server.
 
-It replaces HTTP polling with a persistent connection between client and server.
+Unlike HTTP polling, WebSockets keep a **persistent open connection**, allowing instant bidirectional messaging.
 
 ---
 
@@ -15,60 +12,156 @@ It replaces HTTP polling with a persistent connection between client and server.
 
 - Node.js
 - Express
-- websocket npm package
-- HTML/CSS/JavaScript
+- websocket (npm package)
+- HTML / CSS / Vanilla JavaScript
 
 ---
 
 ## How It Works
 
-A persistent connection is established between client and server.
-
-Both sides can send messages at any time.
+1. Client connects to the WebSocket server
+2. Server immediately sends chat history
+3. Client can:
+   - Send messages
+   - Like messages
+   - Dislike messages
+4. Server broadcasts updates to all connected clients
 
 ---
 
 ## Message Flow
 
-Client ⇄ WebSocket Server ⇄ All Clients
+Client ⇄ WebSocket Server ⇄ All Connected Clients
 
 ---
 
-## Server Features
+## Server Responsibilities
 
-- Stores messages in memory
-- Sends chat history on connection
-- Broadcasts new messages instantly
-- Handles disconnections
-
----
-
-## Advantages
-
-- Real-time communication
-- Low latency
-- Efficient (no repeated HTTP requests)
+- Stores all messages in memory
+- Sends full chat history on new connection
+- Handles incoming events:
+  - `send-message`
+  - `like-message`
+  - `dislike-message`
+- Broadcasts updates to all clients
+- Ensures all clients stay in sync
 
 ---
 
-## Disadvantages
+## Client Responsibilities
 
-- More complex setup
-- Requires connection management
+- Establish WebSocket connection
+- Render chat history on load
+- Send message events to server
+- Update UI when receiving:
+  - New messages
+  - Updated likes/dislikes
 
 ---
 
 ## Message Protocol
 
-All messages use a structured format:
+All communication uses JSON messages with a `command` field.
 
-```json id="wsmsg1"
+### Send Message
+
+```json
 {
   "command": "send-message",
   "message": {
     "username": "John",
-    "text": "Hello"
+    "text": "Hello!",
+    "senderId": "client"
   }
 }
 ```
-````
+
+---
+
+### Like Message
+
+```json
+{
+  "command": "like-message",
+  "messageId": 123456789
+}
+```
+
+---
+
+### Dislike Message
+
+```json
+{
+  "command": "dislike-message",
+  "messageId": 123456789
+}
+```
+
+---
+
+## Server → Client Messages
+
+### Chat History
+
+```json
+{
+  "command": "chat-history",
+  "messages": []
+}
+```
+
+### New Message
+
+```json
+{
+  "command": "new-message",
+  "message": {}
+}
+```
+
+### Updated Message (likes/dislikes)
+
+```json
+{
+  "command": "message-updated",
+  "message": {}
+}
+```
+
+---
+
+## Features
+
+- Real-time messaging
+- Persistent connection
+- Like / Dislike system
+- Live UI updates across all users
+- Message history sync on join
+
+---
+
+## Advantages
+
+- Instant communication (no polling delay)
+- Efficient (single open connection)
+- Scales better for real-time apps
+- Supports bidirectional communication
+
+---
+
+## Disadvantages
+
+- More complex than HTTP polling
+- Requires connection lifecycle handling
+- Needs reconnection handling (not implemented yet)
+
+---
+
+## Key Design Choice
+
+Each message includes a **unique `id`** so that:
+
+- Clients can identify which message to update
+- Server can update likes/dislikes correctly
+- UI stays consistent across all users
