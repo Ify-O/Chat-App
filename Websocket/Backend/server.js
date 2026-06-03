@@ -51,10 +51,12 @@ wsServer.on("request", (request) => {
       messages.push(message);
 
       wsServer.connections.forEach((client) => {
-        send(client, {
-          command: "new-message",
-          message,
-        });
+        if (client.connected) {
+          send(client, {
+            command: "new-message",
+            message,
+          });
+        }
       });
     }
 
