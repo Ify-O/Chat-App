@@ -19,6 +19,14 @@ function send(connection, data) {
   connection.sendUTF(JSON.stringify(data));
 }
 
+function broadcast(data) {
+  wsServer.connections.forEach((client) => {
+    if (client.connected) {
+      send(client, data);
+    }
+  });
+}
+
 wsServer.on("request", (request) => {
   const connection = request.accept(null, request.origin);
 
@@ -34,12 +42,13 @@ wsServer.on("request", (request) => {
 
     const data = JSON.parse(msg.utf8Data);
 
+   
     if (data.command === "send-message") {
       const message = {
-        id: Date.now(),
+        id: String(Date.now()),
         username: data.message.username || "Anonymous",
         text: data.message.text || "",
-        senderId: data.message.senderId,
+        senderId: data.message.senderId || "client",
         likes: 0,
         dislikes: 0,
         timestamp: new Date().toLocaleTimeString([], {
@@ -50,46 +59,40 @@ wsServer.on("request", (request) => {
 
       messages.push(message);
 
-      wsServer.connections.forEach((client) => {
-        if (client.connected) {
-          send(client, {
-            command: "new-message",
-            message,
-          });
-        }
+      broadcast({
+        command: "new-message",
+        message,
       });
     }
 
+    
     if (data.command === "like-message") {
       const message = messages.find(
-        (msg) => String(msg.id) === String(data.messageId),
+        (m) => String(m.id) === String(data.messageId),
       );
 
       if (message) {
-        message.likes++;
+        message.likes += 1;
 
-        wsServer.connections.forEach((client) => {
-          send(client, {
-            command: "message-updated",
-            message,
-          });
+        broadcast({
+          command: "message-updated",
+          message,
         });
       }
     }
 
+    
     if (data.command === "dislike-message") {
       const message = messages.find(
-        (msg) => String(msg.id) === String(data.messageId),
+        (m) => String(m.id) === String(data.messageId),
       );
 
       if (message) {
-        message.dislikes++;
+        message.dislikes += 1;
 
-        wsServer.connections.forEach((client) => {
-          send(client, {
-            command: "message-updated",
-            message,
-          });
+        broadcast({
+          command: "message-updated",
+          message,
         });
       }
     }
