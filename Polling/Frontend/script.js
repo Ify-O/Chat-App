@@ -11,11 +11,13 @@ const sendBtn = document.getElementById("sendBtn");
 
 let currentUser = "";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://localhost:3002";
+
+let messages = [];
 
 joinBtn.addEventListener("click", () => {
   const username = usernameInput.value.trim();
-  if (username === "") return;
+  if (!username) return;
 
   currentUser = username;
 
@@ -24,6 +26,7 @@ joinBtn.addEventListener("click", () => {
 
   startPolling();
 });
+
 
 function addMessage(message, type = "incoming") {
   const div = document.createElement("div");
@@ -34,26 +37,53 @@ function addMessage(message, type = "incoming") {
     <div class="msg-user">${message.username}</div>
     <div class="msg-text">${message.text}</div>
     <div class="msg-time">${message.timestamp}</div>
+
+    <div class="reactions">
+      <button class="like-btn">👍 ${message.likes || 0}</button>
+      <button class="dislike-btn">👎 ${message.dislikes || 0}</button>
+    </div>
   `;
+
+  div.querySelector(".like-btn").addEventListener("click", async () => {
+    await fetch(`${BASE_URL}/messages/${message.id}/like`, {
+      method: "POST",
+    });
+    fetchMessages();
+  });
+
+  
+  div.querySelector(".dislike-btn").addEventListener("click", async () => {
+    await fetch(`${BASE_URL}/messages/${message.id}/dislike`, {
+      method: "POST",
+    });
+    fetchMessages();
+  });
 
   messagesContainer.appendChild(div);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
+
 async function fetchMessages() {
   try {
     const res = await fetch(`${BASE_URL}/messages`);
-    const messages = await res.json();
+    messages = await res.json();
 
-    messagesContainer.innerHTML = "";
-
-    messages.forEach((msg) => {
-      addMessage(msg, msg.username === currentUser ? "outgoing" : "incoming");
-    });
+    renderMessages();
   } catch (err) {
     console.error("Error fetching messages:", err);
   }
 }
+
+
+function renderMessages() {
+  messagesContainer.innerHTML = "";
+
+  messages.forEach((msg) => {
+    addMessage(msg, msg.username === currentUser ? "outgoing" : "incoming");
+  });
+}
+
 
 function startPolling() {
   fetchMessages();
@@ -63,9 +93,10 @@ function startPolling() {
   }, 1000);
 }
 
+
 sendBtn.addEventListener("click", async () => {
   const text = input.value.trim();
-  if (text === "") return;
+  if (!text) return;
 
   await fetch(`${BASE_URL}/messages`, {
     method: "POST",
@@ -80,6 +111,7 @@ sendBtn.addEventListener("click", async () => {
   });
 
   input.value = "";
+  fetchMessages();
 });
 
 input.addEventListener("keypress", (e) => {
