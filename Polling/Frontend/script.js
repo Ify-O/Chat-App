@@ -9,7 +9,6 @@ const joinScreen = document.getElementById("joinScreen");
 const chatScreen = document.getElementById("chatScreen");
 
 const usernameInput = document.getElementById("usernameInput");
-const joinBtn = document.getElementById("joinBtn");
 
 const messagesContainer = document.getElementById("messages");
 
@@ -95,11 +94,19 @@ function addMessage(message) {
 }
 
 function renderMessages() {
+  const shouldScroll =
+    messagesContainer.scrollHeight -
+      messagesContainer.scrollTop -
+      messagesContainer.clientHeight <
+    50;
+
   messagesContainer.innerHTML = "";
 
   messages.forEach(addMessage);
 
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  if (shouldScroll) {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
 }
 
 /* =========================
@@ -114,9 +121,13 @@ async function fetchMessages() {
       throw new Error("Unable to fetch messages.");
     }
 
-    messages = await response.json();
+    const newMessages = await response.json();
 
-    renderMessages();
+    // Only update the UI if something has changed
+    if (JSON.stringify(newMessages) !== JSON.stringify(messages)) {
+      messages = newMessages;
+      renderMessages();
+    }
   } catch (error) {
     console.error("Fetch Error:", error);
   }
@@ -127,10 +138,15 @@ async function fetchMessages() {
 ========================= */
 
 async function startPolling() {
+  if (!pollingStarted) return;
+
   await fetchMessages();
 
-  // Poll every second after the previous request completes
-  setTimeout(startPolling, 1000);
+setTimeout(() => {
+  if (pollingStarted) {
+    startPolling();
+  }
+}, 1000);
 }
 
 /* =========================
@@ -162,6 +178,8 @@ async function sendMessage() {
     }
 
     messageInput.value = "";
+
+    await fetchMessages();
   } catch (error) {
     console.error("Send Error:", error);
   } finally {
@@ -192,6 +210,7 @@ async function updateReaction(messageId, reaction) {
       throw new Error(`Unable to ${reaction} message.`);
     }
 
+    messages = [];
     await fetchMessages();
   } catch (error) {
     console.error("Reaction Error:", error);
