@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Polling Chat Application</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- Join Screen -->
+    <div id="joinScreen" class="join-screen">
+      <form id="joinForm" class="join-card">
+        <h1>Welcome</h1>
+
+        <p>Enter your name to join the chat.</p>
+
+        <label for="usernameInput" class="visually-hidden">
+          Username
+        </label>
+
+        <input
+          id="usernameInput"
+          type="text"
+          placeholder="Your name"
+          maxlength="20"
+          autocomplete="nickname"
+          required
+        />
+
+        <button type="submit" id="joinBtn">
+          Join Chat
+        </button>
+      </form>
+    </div>
+
+    <!-- Chat Screen -->
+    <main id="chatScreen" class="chat-container hidden">
+      <header class="chat-header">
+        <h2>Chat App</h2>
+      </header>
+
+      <section
+        id="messages"
+        class="chat-messages"
+        aria-live="polite"
+        aria-label="Chat messages"
+      ></section>
+
+      <form id="chatForm" class="chat-input">
+        <label for="messageInput" class="visually-hidden">
+          Message
+        </label>
+
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Type a message..."
+          maxlength="250"
+          autocomplete="off"
+          required
+        />
+
+        <button type="submit" id="sendBtn">
+          Send
+        </button>
+      </form>
+
+      <footer class="chat-footer">
+        <p>HTTP Polling Chat Demo</p>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
