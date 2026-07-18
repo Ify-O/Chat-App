@@ -1,3 +1,13 @@
+// Update this after deploying your backend to Render
+// Example:
+// const BASE_URL = "https://your-app-name.onrender.com";
+const BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3002"
+    : "https://your-backend-name.onrender.com";
+
+const joinForm = document.getElementById("joinForm");
+const chatForm = document.getElementById("chatForm");
 const joinScreen = document.getElementById("joinScreen");
 const chatScreen = document.getElementById("chatScreen");
 
@@ -6,116 +16,187 @@ const joinBtn = document.getElementById("joinBtn");
 
 const messagesContainer = document.getElementById("messages");
 
-const input = document.getElementById("messageInput");
+const messageInput = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 
 let currentUser = "";
-
-const BASE_URL = "http://localhost:3002";
-
 let messages = [];
+let pollingStarted = false;
 
-joinBtn.addEventListener("click", () => {
+// Unique ID for this browser session
+const senderId = crypto.randomUUID();
+
+/* =========================
+   Join Chat
+========================= */
+
+joinForm.addEventListener("submit", (event) => {
+  event.preventDefault();
   const username = usernameInput.value.trim();
-  if (!username) return;
+
+  if (!username) {
+    alert("Please enter your name.");
+    return;
+  }
 
   currentUser = username;
 
   joinScreen.classList.add("hidden");
   chatScreen.classList.remove("hidden");
 
-  startPolling();
+  if (!pollingStarted) {
+    pollingStarted = true;
+    startPolling();
+  }
 });
 
+/* =========================
+   Message Rendering
+========================= */
 
-function addMessage(message, type = "incoming") {
+function formatTime(timestamp) {
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function addMessage(message) {
   const div = document.createElement("div");
 
-  div.classList.add("message", type);
+  const type = message.senderId === senderId ? "outgoing" : "incoming";
+
+  div.className = `message ${type}`;
 
   div.innerHTML = `
     <div class="msg-user">${message.username}</div>
+
     <div class="msg-text">${message.text}</div>
-    <div class="msg-time">${message.timestamp}</div>
+
+    <div class="msg-time">${formatTime(message.timestamp)}</div>
 
     <div class="reactions">
-      <button class="like-btn">👍 ${message.likes || 0}</button>
-      <button class="dislike-btn">👎 ${message.dislikes || 0}</button>
+      <button class="like-btn">
+        👍 ${message.likes}
+      </button>
+
+      <button class="dislike-btn">
+        👎 ${message.dislikes}
+      </button>
     </div>
   `;
 
-  div.querySelector(".like-btn").addEventListener("click", async () => {
-    await fetch(`${BASE_URL}/messages/${message.id}/like`, {
-      method: "POST",
-    });
-    fetchMessages();
+  div.querySelector(".like-btn").addEventListener("click", () => {
+    updateReaction(message.id, "like");
   });
 
-  
-  div.querySelector(".dislike-btn").addEventListener("click", async () => {
-    await fetch(`${BASE_URL}/messages/${message.id}/dislike`, {
-      method: "POST",
-    });
-    fetchMessages();
+  div.querySelector(".dislike-btn").addEventListener("click", () => {
+    updateReaction(message.id, "dislike");
   });
 
   messagesContainer.appendChild(div);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
-
-
-async function fetchMessages() {
-  try {
-    const res = await fetch(`${BASE_URL}/messages`);
-    messages = await res.json();
-
-    renderMessages();
-  } catch (err) {
-    console.error("Error fetching messages:", err);
-  }
-}
-
 
 function renderMessages() {
   messagesContainer.innerHTML = "";
 
-  messages.forEach((msg) => {
-    addMessage(msg, msg.username === currentUser ? "outgoing" : "incoming");
-  });
+  messages.forEach(addMessage);
+
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
+/* =========================
+   Fetch Messages
+========================= */
 
-function startPolling() {
-  fetchMessages();
+async function fetchMessages() {
+  try {
+    const response = await fetch(`${BASE_URL}/messages`);
 
-  setInterval(() => {
-    fetchMessages();
-  }, 1000);
+    if (!response.ok) {
+      throw new Error("Unable to fetch messages.");
+    }
+
+    messages = await response.json();
+
+    renderMessages();
+  } catch (error) {
+    console.error("Fetch Error:", error);
+  }
 }
 
+/* =========================
+   Polling
+========================= */
 
-sendBtn.addEventListener("click", async () => {
-  const text = input.value.trim();
+async function startPolling() {
+  await fetchMessages();
+
+  // Poll every second after the previous request completes
+  setTimeout(startPolling, 1000);
+}
+
+/* =========================
+   Send Message
+========================= */
+
+async function sendMessage() {
+  const text = messageInput.value.trim();
+
   if (!text) return;
 
-  await fetch(`${BASE_URL}/messages`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      text,
-      username: currentUser,
-      senderId: "client",
-    }),
-  });
+  sendBtn.disabled = true;
 
-  input.value = "";
-  fetchMessages();
-});
+  try {
+    const response = await fetch(`${BASE_URL}/messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: currentUser,
+        text,
+        senderId,
+      }),
+    });
 
-input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    sendBtn.click();
+    if (!response.ok) {
+      throw new Error("Unable to send message.");
+    }
+
+    messageInput.value = "";
+  } catch (error) {
+    console.error("Send Error:", error);
+  } finally {
+    sendBtn.disabled = false;
+    messageInput.focus();
   }
+}
+
+chatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendMessage();
 });
+
+/* =========================
+   Like / Dislike
+========================= */
+
+async function updateReaction(messageId, reaction) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/messages/${messageId}/${reaction}`,
+      {
+        method: "POST",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Unable to ${reaction} message.`);
+    }
+
+    await fetchMessages();
+  } catch (error) {
+    console.error("Reaction Error:", error);
+  }
+}
