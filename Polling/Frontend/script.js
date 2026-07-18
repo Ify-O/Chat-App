@@ -1,6 +1,3 @@
-// Update this after deploying your backend to Render
-// Example:
-// const BASE_URL = "https://your-app-name.onrender.com";
 const BASE_URL = "http://localhost:3002";
 
 const joinForm = document.getElementById("joinForm");
