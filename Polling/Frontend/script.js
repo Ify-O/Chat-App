@@ -1,10 +1,7 @@
 // Update this after deploying your backend to Render
 // Example:
 // const BASE_URL = "https://your-app-name.onrender.com";
-const BASE_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3002"
-    : "https://your-backend-name.onrender.com";
+const BASE_URL = "http://localhost:3002";
 
 const joinForm = document.getElementById("joinForm");
 const chatForm = document.getElementById("chatForm");
