@@ -1,36 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Chat App</title>
+    <title>Polling Chat Application</title>
 
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
+    <!-- Join Screen -->
     <div id="joinScreen" class="join-screen">
-      <div class="join-card">
+      <form id="joinForm" class="join-card">
         <h1>Welcome</h1>
-        <p>Enter your name to join the chat</p>
 
-        <input id="usernameInput" type="text" placeholder="Your name" />
-        <button id="joinBtn">Join Chat</button>
-      </div>
+        <p>Enter your name to join the chat.</p>
+
+        <label for="usernameInput" class="visually-hidden">
+          Username
+        </label>
+
+        <input
+          id="usernameInput"
+          type="text"
+          placeholder="Your name"
+          maxlength="20"
+          autocomplete="nickname"
+          required
+        />
+
+        <button type="submit" id="joinBtn">
+          Join Chat
+        </button>
+      </form>
     </div>
 
-    <div id="chatScreen" class="chat-container hidden">
-      <div class="chat-header">
-        <h2>Live Chat</h2>
-      </div>
+    <!-- Chat Screen -->
+    <main id="chatScreen" class="chat-container hidden">
+      <header class="chat-header">
+        <h2>Polling Chat</h2>
+      </header>
 
-      <div id="messages" class="chat-messages"></div>
+      <section
+        id="messages"
+        class="chat-messages"
+        aria-live="polite"
+        aria-label="Chat messages"
+      ></section>
 
-      <div class="chat-input">
-        <input id="messageInput" type="text" placeholder="Type a message..." />
-        <button id="sendBtn">Send</button>
-      </div>
-    </div>
+      <form id="chatForm" class="chat-input">
+        <label for="messageInput" class="visually-hidden">
+          Message
+        </label>
+
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Type a message..."
+          maxlength="250"
+          autocomplete="off"
+          required
+        />
+
+        <button type="submit" id="sendBtn">
+          Send
+        </button>
+      </form>
+
+      <footer class="chat-footer">
+        HTTP Polling Chat Demo
+      </footer>
+    </main>
 
     <script src="script.js"></script>
   </body>
