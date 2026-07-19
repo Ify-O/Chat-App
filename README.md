@@ -66,18 +66,25 @@ This setup separates the static frontend from the Express backend while allowing
 ## Project Structure
 
 ```text
-Polling/
-├── Backend/
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── server.js
-│   └── .gitignore
+Chat-App/
 │
-├── Frontend/
-│   ├── index.html
-│   ├── script.js
-│   ├── style.css
-│   └── README.md
+├── Polling/
+│   ├── Backend/
+│   │   ├── node_modules/
+│   │   ├── .gitignore
+│   │   ├── package.json
+│   │   ├── package-lock.json
+│   │   └── server.js
+│   │
+│   └── Frontend/
+│       ├── index.html
+│       ├── script.js
+│       ├── style.css
+│       └── README.md
+│
+├── screenshots/
+│   ├── join-screen.png
+│   └── polling-chat.png
 │
 └── README.md
 ```
