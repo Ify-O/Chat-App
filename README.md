@@ -2,8 +2,24 @@
 
 ## Live Demo
 
-- **Frontend:** https://your-frontend-url
-- **Backend:** https://your-backend-url
+- **Frontend:** https://mc-chatapp.netlify.app/
+- **Backend:** https://chat-app-backend-gr6s.onrender.com/
+
+## Screenshot
+
+### Join Screen
+
+![Join Screen](./Screenshots/join-screen.png)
+
+### Chat Interface
+
+![Polling Chat Application](./Screenshots/polling-chat.png)
+
+<h2>Screenshot</h2>
+
+<p align="center">
+  <img src="./screenshots/polling-chat.png" alt="Polling Chat Application" width="700">
+</p>
 
 ## Overview
 
@@ -45,15 +61,18 @@ The application allows multiple users to send messages, view messages from other
 ## Project Structure
 
 ```text
-polling/
-├── backend/
+Polling/
+├── Backend/
 │   ├── package.json
-│   └── server.js
+│   ├── package-lock.json
+│   ├── server.js
+│   └── .gitignore
 │
-├── frontend/
+├── Frontend/
 │   ├── index.html
 │   ├── script.js
-│   └── style.css
+│   ├── style.css
+│   └── README.md
 │
 └── README.md
 ```
@@ -76,9 +95,11 @@ polling/
 Unlike WebSockets, HTTP is a request-response protocol. The server cannot push updates to connected clients, so the frontend periodically requests the latest messages.
 
 ```javascript
-setInterval(() => {
-  fetch("/messages");
-}, 1000);
+async function startPolling() {
+  await fetchMessages();
+
+  setTimeout(startPolling, 1000);
+}
 ```
 
 Every second the client requests the latest chat messages and updates the interface if new data is available.
@@ -115,6 +136,17 @@ app.use((req, res, next) => {
 ```
 
 Logs every incoming request before passing control to the next middleware.
+
+## Deployment
+
+The application is deployed using:
+
+- **Frontend:** Netlify
+- **Backend:** Render
+
+This setup separates the static frontend from the Express backend while allowing communication through a REST API.
+
+> **Note:** The backend is hosted on Render's free tier. The first request after inactivity may take 30–60 seconds while the service starts.
 
 ---
 

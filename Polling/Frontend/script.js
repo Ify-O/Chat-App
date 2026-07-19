@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3002";
+const BASE_URL = "https://chat-app-backend-gr6s.onrender.com";
 
 const joinForm = document.getElementById("joinForm");
 const chatForm = document.getElementById("chatForm");
