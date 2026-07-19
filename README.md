@@ -18,7 +18,7 @@
 <h2>Screenshot</h2>
 
 <p align="center">
-  <img src="./screenshots/polling-chat.png" alt="Polling Chat Application" width="700">
+  <img src="./Screenshots/polling-chat.png" alt="Polling Chat Application" width="700">
 </p>
 
 ## Overview
