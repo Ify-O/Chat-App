@@ -15,12 +15,6 @@
 
 ![Polling Chat Application](./Screenshots/polling-chat.png)
 
-<h2>Screenshot</h2>
-
-<p align="center">
-  <img src="./Screenshots/polling-chat.png" alt="Polling Chat Application" width="700">
-</p>
-
 ## Overview
 
 This project is a simple real-time chat application built with **Node.js**, **Express**, and **vanilla JavaScript**. It demonstrates how HTTP polling can be used to simulate live updates without using WebSockets.
