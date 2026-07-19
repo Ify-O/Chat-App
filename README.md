@@ -50,6 +50,17 @@ The application allows multiple users to send messages, view messages from other
 - JavaScript (ES6)
 - Fetch API
 
+## Deployment
+
+The application is deployed using:
+
+- **Frontend:** Netlify
+- **Backend:** Render
+
+This setup separates the static frontend from the Express backend while allowing communication through a REST API.
+
+> **Note:** The backend is hosted on Render's free tier. The first request after inactivity may take 30–60 seconds while the service starts.
+
 ---
 
 ## Project Structure
@@ -130,17 +141,6 @@ app.use((req, res, next) => {
 ```
 
 Logs every incoming request before passing control to the next middleware.
-
-## Deployment
-
-The application is deployed using:
-
-- **Frontend:** Netlify
-- **Backend:** Render
-
-This setup separates the static frontend from the Express backend while allowing communication through a REST API.
-
-> **Note:** The backend is hosted on Render's free tier. The first request after inactivity may take 30–60 seconds while the service starts.
 
 ---
 
