@@ -2,29 +2,30 @@ const BASE_URL = "https://chat-app-backend-gr6s.onrender.com";
 
 const joinForm = document.getElementById("joinForm");
 const chatForm = document.getElementById("chatForm");
+
 const joinScreen = document.getElementById("joinScreen");
 const chatScreen = document.getElementById("chatScreen");
 
 const usernameInput = document.getElementById("usernameInput");
+const messageInput = document.getElementById("messageInput");
 
 const messagesContainer = document.getElementById("messages");
-
-const messageInput = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 
 let currentUser = "";
 let messages = [];
 let pollingStarted = false;
 
+const POLLING_INTERVAL = 1000;
+
 // Unique ID for this browser session
 const senderId = crypto.randomUUID();
 
-/* =========================
-   Join Chat
-========================= */
+
 
 joinForm.addEventListener("submit", (event) => {
   event.preventDefault();
+
   const username = usernameInput.value.trim();
 
   if (!username) {
@@ -37,15 +38,15 @@ joinForm.addEventListener("submit", (event) => {
   joinScreen.classList.add("hidden");
   chatScreen.classList.remove("hidden");
 
+  messageInput.focus();
+
   if (!pollingStarted) {
     pollingStarted = true;
     startPolling();
   }
 });
 
-/* =========================
-   Message Rendering
-========================= */
+
 
 function formatTime(timestamp) {
   return new Date(timestamp).toLocaleTimeString([], {
@@ -54,40 +55,65 @@ function formatTime(timestamp) {
   });
 }
 
-function addMessage(message) {
-  const div = document.createElement("div");
+function createMessageElement(message) {
+  const messageElement = document.createElement("div");
 
-  const type = message.senderId === senderId ? "outgoing" : "incoming";
+  const messageType = message.senderId === senderId ? "outgoing" : "incoming";
 
-  div.className = `message ${type}`;
+  messageElement.className = `message ${messageType}`;
 
-  div.innerHTML = `
-    <div class="msg-user">${message.username}</div>
 
-    <div class="msg-text">${message.text}</div>
 
-    <div class="msg-time">${formatTime(message.timestamp)}</div>
+  const username = document.createElement("div");
+  username.className = "msg-user";
+  username.textContent = message.username;
 
-    <div class="reactions">
-      <button class="like-btn">
-        👍 ${message.likes}
-      </button>
+  const text = document.createElement("div");
+  text.className = "msg-text";
+  text.textContent = message.text;
 
-      <button class="dislike-btn">
-        👎 ${message.dislikes}
-      </button>
-    </div>
-  `;
+  const time = document.createElement("div");
+  time.className = "msg-time";
+  time.textContent = formatTime(message.timestamp);
 
-  div.querySelector(".like-btn").addEventListener("click", () => {
+  const reactions = document.createElement("div");
+  reactions.className = "reactions";
+
+  const likeButton = document.createElement("button");
+  likeButton.type = "button";
+  likeButton.className = "like-btn";
+  likeButton.textContent = `👍 ${message.likes}`;
+  likeButton.setAttribute(
+    "aria-label",
+    `Like message from ${message.username}`,
+  );
+
+  const dislikeButton = document.createElement("button");
+  dislikeButton.type = "button";
+  dislikeButton.className = "dislike-btn";
+  dislikeButton.textContent = `👎 ${message.dislikes}`;
+  dislikeButton.setAttribute(
+    "aria-label",
+    `Dislike message from ${message.username}`,
+  );
+
+  likeButton.addEventListener("click", () => {
     updateReaction(message.id, "like");
   });
 
-  div.querySelector(".dislike-btn").addEventListener("click", () => {
+  dislikeButton.addEventListener("click", () => {
     updateReaction(message.id, "dislike");
   });
 
-  messagesContainer.appendChild(div);
+  reactions.appendChild(likeButton);
+  reactions.appendChild(dislikeButton);
+
+  messageElement.appendChild(username);
+  messageElement.appendChild(text);
+  messageElement.appendChild(time);
+  messageElement.appendChild(reactions);
+
+  return messageElement;
 }
 
 function renderMessages() {
@@ -99,28 +125,30 @@ function renderMessages() {
 
   messagesContainer.innerHTML = "";
 
-  messages.forEach(addMessage);
+  messages.forEach((message) => {
+    const messageElement = createMessageElement(message);
+    messagesContainer.appendChild(messageElement);
+  });
 
   if (shouldScroll) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 }
 
-/* =========================
-   Fetch Messages
-========================= */
+
 
 async function fetchMessages() {
   try {
     const response = await fetch(`${BASE_URL}/messages`);
 
     if (!response.ok) {
-      throw new Error("Unable to fetch messages.");
+      throw new Error(`Server returned ${response.status}`);
     }
 
     const newMessages = await response.json();
 
-    // Only update the UI if something has changed
+   
+
     if (JSON.stringify(newMessages) !== JSON.stringify(messages)) {
       messages = newMessages;
       renderMessages();
@@ -130,25 +158,17 @@ async function fetchMessages() {
   }
 }
 
-/* =========================
-   Polling
-========================= */
+
 
 async function startPolling() {
   if (!pollingStarted) return;
 
   await fetchMessages();
 
-setTimeout(() => {
-  if (pollingStarted) {
-    startPolling();
-  }
-}, 1000);
+  setTimeout(startPolling, POLLING_INTERVAL);
 }
 
-/* =========================
-   Send Message
-========================= */
+
 
 async function sendMessage() {
   const text = messageInput.value.trim();
@@ -160,9 +180,11 @@ async function sendMessage() {
   try {
     const response = await fetch(`${BASE_URL}/messages`, {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
       },
+
       body: JSON.stringify({
         username: currentUser,
         text,
@@ -171,14 +193,17 @@ async function sendMessage() {
     });
 
     if (!response.ok) {
-      throw new Error("Unable to send message.");
+      throw new Error(`Server returned ${response.status}`);
     }
 
     messageInput.value = "";
 
+   
+
     await fetchMessages();
   } catch (error) {
     console.error("Send Error:", error);
+    alert("Unable to send your message. Please try again.");
   } finally {
     sendBtn.disabled = false;
     messageInput.focus();
@@ -190,9 +215,7 @@ chatForm.addEventListener("submit", (event) => {
   sendMessage();
 });
 
-/* =========================
-   Like / Dislike
-========================= */
+
 
 async function updateReaction(messageId, reaction) {
   try {
@@ -207,7 +230,10 @@ async function updateReaction(messageId, reaction) {
       throw new Error(`Unable to ${reaction} message.`);
     }
 
+  
+
     messages = [];
+
     await fetchMessages();
   } catch (error) {
     console.error("Reaction Error:", error);
