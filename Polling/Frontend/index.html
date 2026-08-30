@@ -1,27 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="A real-time chat application demonstrating HTTP polling for client-server communication."
+    />
+
     <title>Polling Chat Application</title>
 
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <!-- Join Screen -->
+   
+
     <div id="joinScreen" class="join-screen">
       <form id="joinForm" class="join-card">
         <h1>Welcome</h1>
 
         <p>Enter your name to join the chat.</p>
 
-        <label for="usernameInput" class="visually-hidden">
-          Username
-        </label>
+        <label for="usernameInput" class="visually-hidden"> Username </label>
 
         <input
           id="usernameInput"
+          name="username"
           type="text"
           placeholder="Your name"
           maxlength="20"
@@ -29,18 +36,17 @@
           required
         />
 
-        <button type="submit" id="joinBtn">
-          Join Chat
-        </button>
+        <button type="submit" id="joinBtn">Join Chat</button>
       </form>
     </div>
 
-    <!-- Chat Screen -->
+
     <main id="chatScreen" class="chat-container hidden">
       <header class="chat-header">
         <h2>Chat App</h2>
       </header>
 
+     
       <section
         id="messages"
         class="chat-messages"
@@ -48,13 +54,13 @@
         aria-label="Chat messages"
       ></section>
 
+
       <form id="chatForm" class="chat-input">
-        <label for="messageInput" class="visually-hidden">
-          Message
-        </label>
+        <label for="messageInput" class="visually-hidden"> Message </label>
 
         <input
           id="messageInput"
+          name="message"
           type="text"
           placeholder="Type a message..."
           maxlength="250"
@@ -62,9 +68,7 @@
           required
         />
 
-        <button type="submit" id="sendBtn">
-          Send
-        </button>
+        <button type="submit" id="sendBtn">Send</button>
       </form>
 
       <footer class="chat-footer">
